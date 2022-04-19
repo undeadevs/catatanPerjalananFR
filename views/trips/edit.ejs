@@ -1,0 +1,87 @@
+<% const maxDT = new Date(); %> 
+<% maxDT.setUTCHours(23,59,59); %> 
+<% const splitDT = maxDT.toISOString().split('.'); %> 
+<% if(data){
+    const currentDT = data.tanggalWaktu;
+    data.tanggalWaktu.setUTCDate(currentDT.getDate());
+    data.tanggalWaktu.setUTCMonth(currentDT.getMonth());
+    data.tanggalWaktu.setUTCFullYear(currentDT.getFullYear());
+    data.tanggalWaktu.setUTCHours(currentDT.getHours(), currentDT.getMinutes(), currentDT.getSeconds());
+} %> 
+
+<%- include('../partials/layout', {
+    title: 'Ubah Perjalanan',
+    section: {
+        content: ()=>(
+            data ?
+            html/*html*/`
+            <h3 class="page-title">Ubah Perjalanan</h3>
+            <form action="add" method="post" onsubmit="event.preventDefault(); onSubmit(this)">
+                <div class="input-container">
+                    <label for="tanggalWaktu" class="styled-label">Tanggal & Waktu</label>
+                    <input type="datetime-local" name="tanggalWaktu" id="tanggalWaktu" max="${ splitDT[0] }" class="styled-input" value="${data.tanggalWaktu.toISOString().split('.')[0]}" required>
+                </div>
+                <div class="input-container">
+                    <label for="lokasi" class="styled-label">Lokasi</label>
+                    <input type="text" name="lokasi" id="lokasi" class="styled-input" value="${data.lokasi}" required>
+                </div>
+                <div class="input-container">
+                    <label for="suhu" class="styled-label">Suhu</label>
+                    <input type="suhu" name="suhu" id="suhu" class="styled-input" value="${data.suhu}" required>
+                </div>
+                <button type="submit" class="form-btn styled-btn">Submit</button>
+            </form>
+            ` : html/*html*/`
+            <p class="not-found-desc">Catatan Perjalanan tidak ditemukan.</p>
+            `
+        ),
+        scripts: ()=>(
+            html/*html*/`
+            <script src="/lib/cleave.min.js"></script>
+            <script>
+                const suhuInput = document.getElementById('suhu');
+                new Cleave(suhuInput, {
+                    blocks: [2, 1],
+                    isNumeric: true,
+                    delimiter: '.',
+                    lazyDelimiterShow: true,
+                    onValueChanged: (e)=>{
+                        if(!e.target.value) return;
+                        const suhuValue = parseFloat(e.target.value);
+                        suhuInput.value=suhuValue;
+                        if(suhuValue<10 && suhuValue%1!==0) suhuInput.value=suhuValue*10;
+                    }
+                });
+                async function onSubmit(form) {
+                    if (loading) return;
+                    const formData = new FormData(form);
+                    const data = {};
+                    data.tanggalWaktu = new Date(formData.get('tanggalWaktu'));
+                    data.lokasi = formData.get('lokasi');
+                    data.suhu = parseFloat(formData.get('suhu'));
+                    loading = true;
+                    try {
+                        const res = await fetch(window.location.pathname, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        });
+                        const json = await res.json();
+                        if ('error' in json) {
+                            flash('error', json.error);
+                        } else {
+                            flash('success', json.success);
+                            setTimeout(() => window.location.assign(json.redirect), 1000);
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        alert('Terjadi kesalahan');
+                    }
+                }
+            </script>
+            `
+        )
+    }
+}) %> 

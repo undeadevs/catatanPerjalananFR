@@ -1,0 +1,243 @@
+<%- include('../partials/layout', {
+    title: 'Semua Catatan Perjalanan',
+    section: {
+        content: ()=>(
+            html/*html*/`
+            <h3 class="page-title">Semua Catatan Perjalanan</h3>
+            <a href="/trips/add" class="styled-btn add-btn">Tambah</a>
+            <form action="/trips/get" method="get" id="options-form" onsubmit="event.preventDefault(); onOptions(this)">
+                <div class="input-container">
+                    <label for="search" class="styled-label">Search</label>
+                    <div class="search-container">
+                        <input type="text" name="search" id="search" class="styled-input">
+                        <button class="styled-btn" id="search-btn">Q</button>
+                    </div>
+                </div>
+                <div class="input-container">
+                    <label for="sort" class="styled-label">Pengurutan</label>
+                    <div class="sort-container">
+                        <select name="sortBy" id="sortBy" class="styled-input">
+                            <option value="" selected>-Berdasarkan-</option>
+                            <option value="tanggalWaktu">Tanggal & Waktu</option>
+                            <option value="suhu">Suhu</option>
+                        </select>
+                        <select name="sortType" id="sortType" class="styled-input">
+                            <option value="" selected>-Tipe-</option>
+                            <option value="asc">Kecil - Besar</option>
+                            <option value="desc">Besar - Kecil</option>
+                        </select>
+                        <button class="styled-btn" id="sort-btn">Urutkan</button>
+                    </div>
+                </div>
+            </form>
+            <div class="table-container loading">
+                <table>
+                    <thead>
+                        <th>Tanggal & Waktu</th>
+                        <th>Lokasi</th>
+                        <th>Suhu</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5">-</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">-</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">-</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">-</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="page-container">
+                <div class="page-info">Page <span id="current-page">0</span> of <span id="page-total">0</span></div>
+                <div class="page-btns">
+                    <button class="styled-btn" id="prev-btn">&lt;</button>
+                    <button class="styled-btn" id="next-btn">&gt;</button>
+                </div>
+            </div>
+            `
+        ),
+        scripts: ()=>(
+            html/*html*/`
+            <script>
+                const tableContainer = document.querySelector('.table-container');
+                const tBody = tableContainer.querySelector('tbody');
+
+                const currentPageEl = document.getElementById('current-page');
+                const pageTotalEl = document.getElementById('page-total');
+                const prevBtn = document.getElementById('prev-btn');
+                const nextBtn = document.getElementById('next-btn');
+
+                const searchEl = document.getElementById('search');
+                const sortByEl = document.getElementById('sortBy');
+                const sortTypeEl = document.getElementById('sortType');
+
+                window.addEventListener('load', async()=>{
+                    const qparams = new URLSearchParams(window.location.search);
+                    searchEl.value=qparams.get('search') ?? '';
+                    sortByEl.value=qparams.get('sortBy') ?? '';
+                    sortTypeEl.value=qparams.get('sortType') ?? '';
+                    await getTrips(qparams.get('search'), qparams.get('sortBy'), qparams.get('sortType'), parseInt(qparams.get('page')) || 1);
+                })
+
+                async function onOptions(form){
+                    const qparams = new URLSearchParams(window.location.search);
+                    const formData = new FormData(form);
+                    await getTrips(formData.get('search'), formData.get('sortBy'), formData.get('sortType'), parseInt(qparams.get('page')) || 1);
+                }
+
+                prevBtn.addEventListener('click', async()=>{
+                    const qparams = new URLSearchParams(window.location.search);
+                    searchEl.value=qparams.get('search') ?? '';
+                    sortByEl.value=qparams.get('sortBy') ?? '';
+                    sortTypeEl.value=qparams.get('sortType') ?? '';
+                    await getTrips(qparams.get('search'), qparams.get('sortBy'), qparams.get('sortType'), (parseInt(qparams.get('page')) || 1)-1);
+                })
+
+                nextBtn.addEventListener('click', async()=>{
+                    const qparams = new URLSearchParams(window.location.search);
+                    searchEl.value=qparams.get('search') ?? '';
+                    sortByEl.value=qparams.get('sortBy') ?? '';
+                    sortTypeEl.value=qparams.get('sortType') ?? '';
+                    await getTrips(qparams.get('search'), qparams.get('sortBy'), qparams.get('sortType'), (parseInt(qparams.get('page')) || 1)+1);
+                })
+
+                async function getTrips(search, sortBy, sortType, page) {
+                    console.log(page);
+                    const qparams = new URLSearchParams();
+                    if (search) qparams.set('search', search);
+                    if (sortBy) qparams.set('sortBy', sortBy);
+                    if (sortType) qparams.set('sortType', sortType);
+                    if (page) qparams.set('page', page);
+                    try {
+                        tableContainer.classList.add('loading');
+                        const res = await fetch('/trips/get' + (qparams.toString() ? '?' + qparams.toString() : ''));
+                        const json = await res.json();
+                        if ('error' in json) {
+                            flash('error', json.error);
+                        } else {
+                            window.history.pushState({}, 'GET TRIPS', '/trips' + (qparams.toString() ? '?' + qparams.toString() : ''));
+
+                            tableContainer.classList.remove('loading');
+                            tBody.innerHTML = '';
+
+                            
+                            if(json.data.length>0) {
+                                json.data.forEach(row=>{
+                                    const tr = document.createElement('tr');
+                                    tr.classList.add(row.status.toLowerCase());
+
+
+                                    const twTD = document.createElement('td');
+                                    twTD.textContent=new Date(row.tanggalWaktu).toLocaleDateString('id', { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric' });
+
+                                    
+                                    const lokasiTD = document.createElement('td');
+                                    lokasiTD.textContent = row.lokasi;
+                                    
+                                    
+                                    const suhuTD = document.createElement('td');
+                                    suhuTD.textContent = row.suhu+' °C';
+
+                                    
+                                    const statusTD = document.createElement('td');
+                                    statusTD.textContent = row.status;
+
+                                    
+                                    const actionTD = document.createElement('td');
+
+                                    const actionBtns = document.createElement('div');
+                                    actionBtns.classList.add('action-btns');
+
+                                    const ubahBtn = document.createElement('a');
+                                    ubahBtn.textContent='Ubah';
+                                    ubahBtn.classList.add('styled-btn');
+                                    ubahBtn.classList.add('ubah-btn');
+                                    ubahBtn.href='/trips/'+row.id;
+
+                                    const hapusBtn = document.createElement('button');
+                                    hapusBtn.textContent='Hapus';
+                                    hapusBtn.classList.add('styled-btn');
+                                    hapusBtn.classList.add('hapus-btn');
+                                    hapusBtn.addEventListener('click', async()=>{
+                                        await removeTrip(row.id);
+                                    });
+
+                                    actionBtns.appendChild(ubahBtn);
+                                    actionBtns.appendChild(hapusBtn);
+
+                                    actionTD.appendChild(actionBtns);
+
+
+                                    tr.appendChild(twTD);
+                                    tr.appendChild(lokasiTD);
+                                    tr.appendChild(suhuTD);
+                                    tr.appendChild(statusTD);
+                                    tr.appendChild(actionTD);
+
+                                    tBody.appendChild(tr);
+                                });
+
+                                setPageInfo(json.currentPage, json.pageTotal, json.hasPrev, json.hasNext);
+                            }else{
+                                const tr = document.createElement('tr');
+
+                                const td = document.createElement('td');
+                                td.textContent='Kosong.'
+                                td.colSpan=5;
+
+                                tr.appendChild(td);
+
+                                tBody.appendChild(tr);
+
+                                setPageInfo(0,0,false,false);
+                            }
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        alert('Terjadi kesalahan');
+                    }
+                }
+
+                async function removeTrip(id){
+                    if(loading) return;
+                    try{
+                        loading=true;
+                        const res = await fetch('/trips/'+id, {
+                            method: 'DELETE'
+                        });
+                        const json = await res.json();
+                        if('error' in json){
+                            flash('error', json.error);
+                        }else{
+                            flash('success', json.success);
+                            setTimeout(()=>window.location.assign(json.redirect), 1000);
+                        }
+                    }catch(err){
+                        console.error(err);
+                        alert('Terjadi kesalahan');
+                    }
+                    loading=false;
+                }
+
+                function setPageInfo(currentPage, pageTotal, hasPrev, hasNext){
+                    currentPageEl.textContent=currentPage;
+                    pageTotalEl.textContent=pageTotal;
+                    prevBtn.disabled = !hasPrev;
+                    nextBtn.disabled = !hasNext;
+                }
+            </script>
+            `
+        )
+    }
+}) %> 

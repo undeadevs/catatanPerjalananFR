@@ -1,0 +1,216 @@
+*, *::before, *::after{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+
+:root{
+    --color-accent: #dd30b2;
+}
+
+button{
+    font-family: sans-serif;
+    cursor: pointer;
+}
+
+body{
+    background-color: #444444;
+}
+
+.flash{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    padding: .5rem;
+    background-color: gray;
+    color: white;
+    text-align: center;
+    transform: translateY(-100%);
+    transition: .5s transform ease-in;
+}
+
+.flash.active{
+    transform: translateY(0%);
+}
+
+.flash.success{
+    background-color: #2ac063;
+}
+
+.flash.error{
+    background-color: #cf2f64;
+}
+
+.styled-btn{
+    border: 0;
+    border-radius: .25rem;
+    padding: .5rem 1rem;
+    background-color: var(--color-accent);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.styled-label{
+    color: #dbdbdb;
+}
+
+.styled-input{
+    border: 0;
+    border-radius: .25rem;
+    padding: .5rem 1rem;
+    background-color: #585858;
+    color: #dbdbdb;
+    width: 100%;
+    font-size: 1rem;
+}
+
+.search-container{
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    gap: .5rem;
+}
+
+.sort-container{
+    display: grid;
+    display: grid;
+    grid-template-columns: 1fr 1fr max-content;
+    gap: .5rem;
+}
+
+.page-title{
+    color: white;
+    margin: 1rem 0;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+.logo{
+    color: white;
+    letter-spacing: .5rem;
+}
+
+nav{
+    color: #dfdfdf;
+    background-color: #2c2c2c;
+    padding: .5rem 1rem;
+    margin: .5rem 0;
+    border-radius: .25rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    align-items: center;
+}
+
+.nav-link{
+    text-decoration: none;
+    color: white;
+}
+
+.dashboard-msg{
+    color: white;
+    text-align: center;
+    width: 100%;
+    padding: 1rem;
+}
+
+.ubah-btn{
+    text-decoration: none;
+}
+
+.page-container{
+    display: grid;
+    grid-template-columns: 1fr max-content;
+}
+
+.page-btns button{
+    font-weight: 600;
+}
+
+.page-btns button:disabled{
+    color: var(--color-accent);
+    background-color: #2c2c2c;
+}
+
+.add-btn{
+    text-decoration: none;
+    display: grid;
+    width: fit-content;
+    margin: 0 auto;
+}
+
+.table-container{
+    width: 100%;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 1rem 0;
+}
+
+.table-container table {
+    width: 100%;
+    min-width: max-content;
+    border-collapse: collapse;
+    color: white;
+}
+
+.table-container tbody tr{
+    background-color: #2c2c2c;
+}
+
+.table-container tbody tr.demam{
+    background-color: #6e203a;
+}
+
+.table-container th{
+    padding: .5rem;
+}
+
+.table-container td{
+    padding: .5rem;
+    text-align: center;
+}
+
+.action-btns{
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.page-info{
+    color: white;
+}
+
+.layout{
+    margin: 1rem;
+}
+
+form{
+    display: grid;
+    gap: 1rem;
+}
+
+.form-btn{
+    width: max-content;
+    margin: 0 auto;
+}
+
+.auth-body{
+    height: 100vh;
+    margin: 1rem;
+    display: grid;
+    place-content: center;
+}
+
+.auth-btns {
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    gap: .5rem;
+}
+
+.auth-logo{
+    font-size: 2rem;
+}

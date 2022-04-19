@@ -1,0 +1,13 @@
+<%- include('./partials/layout', {
+    title: 'Dashboard',
+    section: {
+        content: ()=>(
+            html/*html*/`
+            <h3 class="page-title">Dashboard</h3>
+            <p class="dashboard-msg">
+                Selamat Datang ${locals.user.nama}
+            </p>
+            `
+        )
+    }
+}) %> 

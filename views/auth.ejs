@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOOTPRINTS | Authentication</title>
+    <link rel="stylesheet" href="/css/global.css">
+</head>
+
+<body class="auth-body">
+    <div class="flash">-</div>
+    <main>
+        <h2 class="page-title auth-logo">FOOTPRINTS</h2>
+        <form id="auth-form" action="" method="post" onsubmit="event.preventDefault(); login(this)">
+            <div class="input-container">
+                <label for="nik" class="styled-label">NIK</label>
+                <input type="text" name="nik" id="nik" class="styled-input" required>
+            </div>
+            <div class="input-container">
+                <label for="nama" class="styled-label">Nama Lengkap</label>
+                <input type="text" name="nama" id="nama" class="styled-input" required>
+            </div>
+            <div class="auth-btns">
+                <button type="button" class="styled-btn" onclick="register(document.getElementById('auth-form'))">Saya
+                    Pengguna Baru</button>
+                <button type="submit" class="styled-btn">Masuk</button>
+            </div>
+        </form>
+    </main>
+    <script src="/lib/cleave.min.js"></script>
+    <script src="/js/global.js"></script>
+    <script>
+        new Cleave('#nik', {
+            blocks: [2,2,2,6,4],
+            isNumeric: true
+        });
+
+        async function login(form) {
+            if (loading) return;
+            const formData = new FormData(form);
+            const data = {};
+            data.nik = formData.get('nik').replace(/ /g,'');
+            data.nama = formData.get('nama');
+            loading = true;
+            try {
+                const res = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                const json = await res.json();
+                if ('error' in json) {
+                    flash('error', json.error);
+                } else {
+                    flash('success', json.success);
+                    setTimeout(() => window.location.assign(json.redirect), 1000);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Terjadi kesalahan');
+            }
+            loading = false;
+        }
+
+        async function register(form) {
+            if (loading) return;
+            const formData = new FormData(form);
+            const data = {};
+            data.nik = formData.get('nik').replace(/ /g,'');
+            data.nama = formData.get('nama');
+            loading = true;
+            try{
+                const res = await fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            const json = await res.json();
+            if ('error' in json) {
+                flash('error', json.error);
+            } else {
+                flash('success', json.success);
+                setTimeout(() => window.location.assign(json.redirect), 1000);
+            }
+            }catch(err){
+                console.error(err);
+                alert('Terjadi kesalahan');
+            }
+            loading = false;
+        }
+    </script>
+</body>
+
+</html>

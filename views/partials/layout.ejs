@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOOTPRINTS | <%= title %></title>
+    <link rel="stylesheet" href="/css/global.css">
+    <%- section['headExt']?.() %>
+</head>
+
+<body class="layout">
+    <div class="flash">-</div>
+    <h2 class="logo" aria-hidden="true">FOOT<wbr>PRINTS</h2>
+    <nav>
+        <a href="/dashboard" class="nav-link">Dashboard</a> |
+        <a href="/trips/add" class="nav-link">Isi Catatan Perjalanan</a> |
+        <a href="/trips" class="nav-link">Catatan Perjalanan</a> |
+        <button class="styled-btn" id="logout-btn" onclick="logOut()">Logout</button>
+    </nav>
+    <main>
+        <%- section['content']?.() %>
+    </main>
+    <script src="/js/global.js"></script>
+    <%- section['scripts']?.() %>
+</body>
+
+</html>
