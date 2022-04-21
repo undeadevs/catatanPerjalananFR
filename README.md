@@ -23,6 +23,8 @@ Project yang harus dibuat ini sangatlah simple: membuat sebuah aplikasi untuk me
 
 Backend yang saya gunakan adalah **Node.js**.
 
+Untuk menginstall semua package yang diperlukan ketik `npm install` pada console.
+
 Untuk menjalankan aplikasi ketik `npm run dev` pada console.
 
 **NPM Package yang saya gunakan:**
